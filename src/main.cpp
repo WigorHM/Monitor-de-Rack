@@ -15,12 +15,12 @@ const int pin_magnetico = 0;
 
 DHT dht(DHTPIN, DHTTYPE);
 
-float ler_temperatura();
-float ler_umidade();
-float ler_tensao();
-bool ler_fumaca();
-bool ler_magnetico();
-void controle_ventoinha(char* comando);
+double ler_temperatura();
+double ler_umidade();
+double ler_tensao();
+int ler_fumaca();
+int ler_magnetico();
+void controle_ventoinha(int comando);
 
 void setup() {
   Serial.begin(9600);
@@ -33,18 +33,18 @@ void setup() {
 
 void loop() {
   //usaremos a função loop para ser a verificadora dos sensores
-  float temp = ler_temperatura(); 
-  float umidade = ler_umidade();
-  float tensao = ler_tensao();
-  bool fumaca = ler_fumaca();
-  bool porta = ler_magnetico();
+  double temp = ler_temperatura(); 
+  double umidade = ler_umidade();
+  double tensao = ler_tensao();
+  int fumaca = ler_fumaca();
+  int porta = ler_magnetico();
 
   if(temp > 30){
     codigo[0] = '1';
-    controle_ventoinha("on");
+    controle_ventoinha(1);
   }else{
     codigo[0] = '0';
-    controle_ventoinha("off");
+    controle_ventoinha(0);
   }
 
   if(umidade > 70.0 || umidade < 40){
@@ -71,49 +71,55 @@ void loop() {
     codigo[4] = '0';
   }
   char json_code[100];
-  snprintf(json_code, sizeof(json_code),"{'code': %s, 'temperatura': %d, 'umidade': %d, 'tensao': %d,'fumaca': %d,'porta': %d}", codigo, temp, umidade, tensao, fumaca, porta);
+  snprintf(json_code, sizeof(json_code),"{'code': %s, 'temperatura': %lf, 'umidade': %lf, 'tensao': %lf, 'fumaca': %d, 'porta': %d}", codigo, temp, umidade, tensao, fumaca, porta);
   Serial.println(codigo);
 }
 
-float ler_temperatura(){
-  float temperatura = dht.readTemperature(false);
+double ler_temperatura(){
+  double temperatura = dht.readTemperature(false);
   return temperatura;
 }
 
-float ler_umidade(){
-  float umidade = dht.readHumidity();
+double ler_umidade(){
+  double umidade = dht.readHumidity();
   return umidade;
 }
-float tensao(){
+double ler_tensao(){
   int leitura = analogRead(pin_tensao);
-  float tensao = (leitura * 5.0) / 1023.0; // converte para tensão em volts
+  double tensao = (leitura * 5.0) / 1023.0; // converte para tensão em volts
   return tensao;
 }
 
-bool ler_fumaca(){
+int ler_fumaca(){
     int leitura = analogRead(pin_fumaca);
-    float tensao = leitura * (5.0 / 1023.0);
+    double tensao = leitura * (5.0 / 1023.0);
 
     if(tensao>0 && tensao<2.75){
-      return false;
+      return 0;
     }else{
-      return true;  
+      return 1;  
     }
 }
 
-bool ler_magnetico(){
+int ler_magnetico(){
   //lê se a porta está aberta
   int estado = digitalRead(pin_magnetico);
 
   if(estado== HIGH){
-    return true;
+    return 1;
   }else{
-    return false;
+    return 0;
   }
 }
 
 
-void controle_ventoinha(char* comando){
+void controle_ventoinha(int comando){
+
+  if(comando == 1){
+    Serial.println("Ligar ventoinha");
+  }else if(comando == 0){
+    Serial.println("Desligar ventoinha");  
+  }
   //implementar
   
 }

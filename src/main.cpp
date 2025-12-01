@@ -84,7 +84,7 @@ char json_code[100];
 snprintf(
     json_code,
     sizeof(json_code),
-    "{'code': %s, 'temperatura': %s, 'umidade': %s, 'tensao': %s, 'fumaca': %d, 'porta': %d }",
+    "\"{'code': %s, 'temperatura': %s, 'umidade': %s, 'tensao': %s, 'fumaca': %d, 'porta': %d }\"",
     codigo, 
     temp_str, 
     umidade_str, 
